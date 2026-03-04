@@ -1,0 +1,22 @@
+{
+	"config":
+			{
+				"db_update": 10,
+				"max_responses": 5,
+				"name": "SkillBoxSearchEngine",
+				"version":0.1 
+			},
+	"files":
+			[
+				"resources/file001.txt",
+				"resources/file002.txt",
+				"resources/file003.txt",
+				"resources/file004.txt",
+				"resources/file005.txt",
+				"resources/file006.txt",
+				"resources/file007.txt",
+				"resources/file008.txt",
+				"resources/file009.txt",
+				"resources/file010.txt"
+			]
+}
