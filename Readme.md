@@ -157,6 +157,8 @@ SearchEngine
 │   ├── InvertedIndex.cpp
 │   ├── SearchServer.cpp
 │   ├── JsonStorage.cpp
+│	├── TextUtils.cpp
+│	├── main.cpp
 │	└── CMakeLists.txt
 │	
 ├── tests
