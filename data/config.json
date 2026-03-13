@@ -1,0 +1,11 @@
+{
+  "config": {
+    "name": "SearchEngine",
+    "version": "6.0",
+    "max_responses": 5,
+
+    "files": [
+      "docs/"
+    ]
+  }
+}

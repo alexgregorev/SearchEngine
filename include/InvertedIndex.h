@@ -1,64 +1,42 @@
 #pragma once
 
-#include "ConverterJSON.h"
-
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <mutex>
 #include <string>
-#include <thread>
 #include <vector>
-#include <utility>
+#include <unordered_map>
 
 struct Entry
 {
     size_t doc_id;
     size_t count;
-
-    bool operator == ( const Entry& other ) const
-    {
-        return ( doc_id == other.doc_id && count == other.count );
-    }
-};
-
-struct TextIndex
-{
-    vector<string> doc_text;
-    size_t doc_id;
-
-    bool operator == ( const TextIndex& other ) const
-    {
-        return ( doc_text == other.doc_text && doc_id == other.doc_id );
-    }
 };
 
 class InvertedIndex
 {
 public:
-    InvertedIndex() = default;
 
-    InvertedIndex( const ConverterJSON& cvr );
+    void indexDocumentsParallel(
+        const std::vector<std::string>& docs,
+        const std::vector<std::string>& paths);
 
-    void indexDocument( TextIndex texts_input );
+    const std::vector<Entry>& get(
+        const std::string& word) const;
 
-    void updateDocumentBase( vector<string> input_docs );
+    const std::string& getPath(size_t id) const;
 
-    static TextIndex docOutVector( const string& doc_page, const size_t& doc_id );
+    size_t docsCount() const;
 
-    static TextIndex docOutFile( const string& doc_page, const size_t& doc_id );
+    size_t length(size_t id) const;
 
-    static void letterCase( char& value );
-
-    static bool validSimbol (const char& value );
-
-    void setDocBase();
-
-    void getDocBase();
-
-    vector<Entry> getWordCount( const string& word );
+    double avgLen = 0;
 
 private:
-    ConverterJSON _convert;
-    map<string, vector<Entry>> freq_dictionary;
+
+    void computeAvg();
+
+    std::unordered_map<std::string,
+        std::vector<Entry>> freq;
+
+    std::vector<size_t> docLength;
+
+    std::vector<std::string> docPaths;
 };

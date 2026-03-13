@@ -1,29 +1,40 @@
 #pragma once
 
-#include "ConverterJSON.h"
 #include "InvertedIndex.h"
 
-#include <fstream>
-#include <string>
 #include <vector>
+#include <string>
+#include <cmath>
+
+struct RelativeIndex
+{
+    size_t doc_id;
+    float rank;
+
+    bool operator<(const RelativeIndex& other) const
+    {
+        if (std::fabs(rank - other.rank) < 1e-6)
+            return doc_id < other.doc_id;
+
+        return rank > other.rank;
+    }
+};
 
 class SearchServer
 {
 public:
 
-    SearchServer() = default;
+    SearchServer(InvertedIndex& i, size_t maxRes);
 
-    SearchServer( InvertedIndex& idx );
+    std::vector<RelativeIndex> searchQuery(const std::string& q);
 
-    vector<vector<RelativeIndex>>& search( vector<string> queries_input );
+    const std::string& getPath(size_t id) const;
 
-    void requestParsing( const vector<string>& input_words );
-
-    void distribution( vector<vector<size_t>>& document );
-
-    vector<vector<RelativeIndex>>& getAnswers();
+    size_t docsCount() const;
 
 private:
-    InvertedIndex _index;
-    vector<vector<RelativeIndex>> relative_index;
+
+    InvertedIndex& index;
+
+    size_t maxResponses;
 };

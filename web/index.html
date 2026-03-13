@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <form id="searchForm" class="search">
+         
+            <input id="query" type="text" autocomplete="off">
+
+            <button id="searchBtn" type="submit">Search</button>
+
+        </form>
+
+        <div id="stats"></div>
+
+        <div id="results"></div>
+
+        <div id="docView" style="display:none">
+
+            <div class="docHeader">
+
+                <div>
+                    <div id="docName"></div>
+                    <div id="docPath"></div>
+                </div>
+
+                <div class="docNav">
+                    <button id="prevMark">◀</button>
+                    <span id="markIndex">0 / 0</span>
+                    <button id="nextMark">▶</button>
+                    <button id="backBtn">Back</button>
+                </div>
+
+            </div>
+
+<pre id="docText"></pre>
+
+            <div id="markMap"></div>
+
+        </div>
+
+    </div>
+
+    <template id="result-template">
+
+        <div class="result">
+
+            <a class="result-link"></a>
+
+            <div class="result-path"></div>
+
+            <div class="result-score"></div>
+
+            <div class="result-snippet"></div>
+
+        </div>
+
+    </template>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

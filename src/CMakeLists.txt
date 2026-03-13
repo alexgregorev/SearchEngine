@@ -1,16 +1,54 @@
+############################################################
+# Library
+############################################################
 
-set(Src
-        main.cpp
-        ConverterJSON.cpp
-        InvertedIndex.cpp
-        SearchServer.cpp
-        ${MY_INCLUDE_DIR}/ConverterJSON.h
-        ${MY_INCLUDE_DIR}/InvertedIndex.h
-        ${MY_INCLUDE_DIR}/SearchServer.h
+add_library(SearchEngineLib
+    InvertedIndex.cpp
+    JsonStorage.cpp
+    SearchServer.cpp
+    TextUtils.cpp
+    WebServer.cpp
 )
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
-add_executable(SearchEngine ${Src})
+target_include_directories(SearchEngineLib
+    PUBLIC
+        ${PROJECT_SOURCE_DIR}/include
+        ${httplib_SOURCE_DIR}
+)
 
-target_link_libraries(SearchEngine PRIVATE nlohmann_json::nlohmann_json)
-target_include_directories(SearchEngine PUBLIC ${MY_INCLUDE_DIR})
+target_link_libraries(SearchEngineLib
+    PUBLIC
+        nlohmann_json::nlohmann_json
+)
+
+############################################################
+# Compiler warnings
+############################################################
+
+if (MSVC)
+    target_compile_options(SearchEngineLib PRIVATE /W4)
+else()
+    target_compile_options(SearchEngineLib PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
+endif()
+
+############################################################
+# Executable
+############################################################
+
+add_executable(SearchEngine
+    main.cpp
+)
+
+target_link_libraries(SearchEngine
+    PRIVATE
+    SearchEngineLib
+)
+
+set_target_properties(SearchEngine
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}
+)

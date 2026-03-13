@@ -1,95 +1,104 @@
-#include "ConverterJSON.h"
-#include "InvertedIndex.h"
 #include "SearchServer.h"
+#include "TextUtils.h"
 
-SearchServer::SearchServer( InvertedIndex& idx ) : _index( idx ) {};
+#include <map>
+#include <algorithm>
+#include <cmath>
 
-vector<vector<RelativeIndex>>& SearchServer::search( vector<string> queries_input )
+const float BM25_K = 1.6f;
+const float BM25_B = 0.75f;
+
+SearchServer::SearchServer(
+    InvertedIndex& i,
+    size_t maxRes)
+    :index(i),maxResponses(maxRes)
 {
-    relative_index.clear();
-
-    for ( auto& request : queries_input )
-    {
-        string word;
-        vector<string> input_words;
-
-        for( auto simbol = 0; simbol < request.length(); ++simbol )
-        {
-            if ( request[ simbol ] != ' ' )
-            {
-                word += request[ simbol ];
-                if ( simbol != request.length() - 1 )
-                    continue;
-            }
-            input_words.push_back( word );
-            word.clear();
-        }
-
-        if ( input_words.size() > 10 )
-        {
-            input_words.clear();
-            cerr << "Overlong request" << endl;
-        }
-        else
-            requestParsing( input_words );
-    }
-    return relative_index;
 }
 
-void SearchServer::requestParsing( const vector<string>& input_words )
+std::vector<RelativeIndex>
+SearchServer::searchQuery(const std::string& q)
 {
-    vector<Entry> entry;
-    vector<vector<size_t>> document;
+    std::vector<std::string> words =
+        TextUtils::tokenize(q);
 
-    for ( auto& word : input_words )
+    std::map<size_t,double> scores;
+
+    double N = index.docsCount();
+
+    for (auto& term : words)
     {
-        entry = _index.getWordCount( word );
-        for ( auto& [ doc_id, count ] : entry )
+        const auto& entries = index.get(term);
+
+        double df = entries.size();
+
+        if (df == 0)
+            continue;
+
+        double idf =
+            log((N - df + 0.5)/(df + 0.5) + 1);
+
+        for (auto& e : entries)
         {
-            bool check = true;
-            for ( auto& it : document )
-            {
-                if ( it[ 1 ] ==  doc_id )
-                {
-                    it[ 0 ] += count;
-                    check = false;
-                    break;
-                }
-            }
-            if ( check ) document.push_back({ count, doc_id });
+            double norm = 1;
+
+            double tf = e.count;
+
+            double dl = index.length(e.doc_id);
+
+            if (index.avgLen > 0)
+                norm = dl / index.avgLen;
+
+            double denom =
+                tf + BM25_K * (1 - BM25_B + BM25_B * norm);
+
+            if (denom == 0)
+                denom = 1e-9;
+
+            if (index.avgLen > 0)
+                norm = dl/index.avgLen;
+
+            double score =
+                idf *
+                ((tf*(BM25_K+1))/denom);
+
+            scores[e.doc_id] += score;
         }
     }
-    distribution( document );
+
+    if (scores.empty())
+        return {};
+
+    double maxScore = 0.0;
+
+    for (const auto& [d, s] : scores)
+        if (s > maxScore)
+            maxScore = s;
+    
+    std::vector<RelativeIndex> result;
+
+    for (auto& [doc, score] : scores)
+    {
+        float rank = maxScore > 1e-12
+            ? static_cast<float>(score / maxScore)
+            : 0.f;
+
+        result.push_back({ doc,rank });
+    }
+
+    std::sort(result.begin(),result.end());
+
+    if (result.size() > maxResponses)
+        result.resize(maxResponses);
+
+    return result;
 }
 
-void SearchServer::distribution( vector<vector<size_t>>& document )
+const std::string& SearchServer::getPath(size_t id) const
 {
-    float max = 0;
-    if ( ! document.empty())
-    {
-        sort( document.begin(), document.end(),
-              []( const vector<size_t>& a, const vector<size_t>& b )
-              {
-                  return a[ 0 ] > b[ 0 ];
-			});
-        max = document[ 0 ][ 0 ];
-    }
-	
-    RelativeIndex rlv{};
-    vector<RelativeIndex> input_relative;
-
-    int responsesLimit = ConverterJSON::getResponsesLimit();
-    for ( auto& it : document )
-    {
-        if ( input_relative.size() == responsesLimit ) break;
-        rlv.doc_id = it[ 1 ];
-        rlv.rank = static_cast<float>( it[ 0 ] ) / max;
-        input_relative.push_back({ rlv.doc_id, rlv.rank });
-    }
-    relative_index.push_back( input_relative );
+    return index.getPath(id);
 }
 
-vector<vector<RelativeIndex>>& SearchServer::getAnswers()
+size_t SearchServer::docsCount() const
 {
-    return relative_index;
+    return index.docsCount();
 }

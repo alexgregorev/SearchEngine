@@ -1,0 +1,225 @@
+:root {
+    --bg: #fafafa;
+    --panel: #ffffff;
+    --border: #e6e6e6;
+    --coffee: #b08a5a;
+    --coffee-light: #c49a6c;
+    --coffee-dark: #5c3b1e;
+    --text: #2b2b2b;
+    --muted: #777;
+}
+
+/* PAGE */
+
+body {
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.container {
+    width: 900px;
+    margin: auto;
+}
+
+/* SEARCH BAR */
+
+.search {
+    margin: 24px 0;
+    display: flex;
+    gap: 10px;
+}
+
+#query {
+    flex: 1;
+    padding: 10px 12px 10px 40px;
+    font-size: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    outline: none;
+    background: white;
+    transition: all .15s ease;
+    background: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239aa0a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>\
+<circle cx='11' cy='11' r='7'/>\
+<line x1='21' y1='21' x2='16.65' y2='16.65'/>\
+</svg>") no-repeat 12px center;
+}
+
+#query:focus {
+	border-color: var(--coffee);
+	box-shadow: 0 0 0 3px rgba(176,138,90,.15);
+}
+
+/* BUTTONS */
+
+button {
+    background: linear-gradient(180deg,#2ea043,#238636);
+    border: 1px solid rgba(27,31,36,0.15);
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: all .15s ease;
+}
+
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+/* STATS */
+
+#stats {
+    margin-bottom: 18px;
+    color: var(--muted);
+}
+
+/* RESULT CARD */
+
+.result {
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all .15s ease;
+}
+
+	.result:hover {
+		border-color: var(--coffee);
+		box-shadow: 0 4px 14px rgba(0,0,0,.05);
+	}
+
+/* TITLE */
+
+.result-link {
+    font-size: 17px;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+}
+
+    .result-link:hover {
+        color: var(--coffee-dark);
+    }
+
+/* PATH */
+
+.result-path {
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+/* SCORE */
+
+.result-score {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* SNIPPETS */
+
+.result-snippet {
+    margin-top: 6px;
+    color: #444;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .25s ease;
+}
+
+    .result-snippet.show {
+        max-height: 220px;
+    }
+
+/* SNIPPET BLOCK */
+
+.snippet-block {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+/* HIGHLIGHT */
+
+mark {
+    background: #ffe7c7;
+    padding: 2px 3px;
+    border-radius: 3px;
+}
+
+.result-snippet mark {
+    background: #ffd54f;
+}
+
+    .result-snippet mark.current {
+        background: orange;
+    }
+
+/* DOCUMENT VIEW */
+
+.docHeader {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    background: white;
+    position: sticky;
+    top: 0;
+}
+
+#docName {
+    font-weight: 600;
+}
+
+#docPath {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+#docText {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: ui-monospace, Consolas, monospace;
+    height: 85vh;
+    overflow: auto;
+    line-height: 22px;
+}
+
+	#docText::-webkit-scrollbar {
+		width: 8px;
+	}
+
+		#docText::-webkit-scrollbar-thumb {
+			background: #c8a27a;
+			border-radius: 4px;
+		}
+
+/* MARK MAP */
+
+#markMap {
+    position: fixed;
+    right: 6px;
+    top: 0;
+    width: 6px;
+    height: 100%;
+}
+
+.markDot {
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: #e5533d;
+    cursor: pointer;
+}
